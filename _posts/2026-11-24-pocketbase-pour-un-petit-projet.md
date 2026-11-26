@@ -2,7 +2,7 @@
 title: "PocketBase pour un petit projet d'équipe : mon avis"
 date: 2026-11-24 09:00:00 -0500
 categories: [PocketBase, Avis]
-tags: [pocketbase, avis, equipe, backend]
+tags: [pocketbase, avis, équipe, backend]
 description: "Avis motivé sur PocketBase pour un petit projet d'équipe : forces observées, faiblesses, cas recommandés et déconseillés, et limites de cet avis."
 ---
 

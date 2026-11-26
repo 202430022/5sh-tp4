@@ -1,8 +1,8 @@
 ---
 title: "PocketBase : un backend complet dans un seul fichier"
 date: 2026-11-16 09:00:00 -0500
-categories: [PocketBase, Presentation]
-tags: [pocketbase, backend, sqlite, serie]
+categories: [PocketBase, Présentation]
+tags: [pocketbase, backend, sqlite, série]
 pin: true
 description: "Présentation de la série : ce que contient PocketBase, à qui elle s'adresse et comment les quatre articles suivants s'enchaînent."
 ---
