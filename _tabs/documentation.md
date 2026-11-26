@@ -23,5 +23,3 @@ Les cinq articles de la série sont regroupés dans la catégorie [PocketBase]({
 3. [Règles d'accès : trois états qui expliquent tout]({{ site.baseurl }}/posts/regles-acces-trois-etats/)
 4. [PocketBase ou Supabase : comparer sur des critères utiles]({{ site.baseurl }}/posts/pocketbase-ou-supabase/)
 5. [PocketBase pour un petit projet d'équipe : mon avis]({{ site.baseurl }}/posts/pocketbase-pour-un-petit-projet/)
-
-<!-- v�rification -->
