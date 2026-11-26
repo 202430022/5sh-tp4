@@ -1,8 +1,8 @@
 ---
 title: "Installer PocketBase : l'erreur qui m'a le plus appris"
 date: 2026-11-18 09:00:00 -0500
-categories: [PocketBase, Retour d'expérience]
-tags: [pocketbase, installation, dépannage]
+categories: [PocketBase, Retour d'experience]
+tags: [pocketbase, installation, depannage]
 description: "Récit de l'installation de PocketBase 0.40.6 sous Windows : un port déjà occupé, un message trompeur, et deux dossiers qu'il faut absolument distinguer."
 ---
 

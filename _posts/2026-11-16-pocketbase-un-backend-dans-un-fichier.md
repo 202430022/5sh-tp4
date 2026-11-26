@@ -1,8 +1,8 @@
 ---
 title: "PocketBase : un backend complet dans un seul fichier"
 date: 2026-11-16 09:00:00 -0500
-categories: [PocketBase, Présentation]
-tags: [pocketbase, backend, sqlite, série]
+categories: [PocketBase, Presentation]
+tags: [pocketbase, backend, sqlite, serie]
 pin: true
 description: "Présentation de la série : ce que contient PocketBase, à qui elle s'adresse et comment les quatre articles suivants s'enchaînent."
 ---
@@ -25,22 +25,22 @@ flowchart LR
     client["Application Web ou mobile"]
     console["Console d'administration"]
     api["API REST et temps réel"]
-    règles["Règles d'accès"]
+    regles["Règles d'accès"]
     sqlite[("SQLite : pb_data/data.db")]
     fichiers["Fichiers déposés"]
     migrations["pb_migrations"]
 
     client --> api
     console --> api
-    api --> règles
-    règles --> sqlite
+    api --> regles
+    regles --> sqlite
     api --> fichiers
     migrations --> sqlite
 ```
 
 La console n'a aucun privilège particulier : elle utilise la même API que n'importe quel client. C'est une bonne nouvelle pour comprendre l'outil, parce qu'une manipulation dans l'interface correspond toujours à une requête qu'on peut reproduire dans un terminal.
 
-Le projet de la série applique ce modèle à un scénario simple : un laboratoire prête du matériel — projecteurs, ordinateurs, caméras — à des étudiants. Trois collections suffisent. `équipements` décrit l'inventaire, `membres` contient les comptes et les rôles, `prets` relie un équipement à un membre. Deux rôles, `etudiant` et `technicien`, distinguent celui qui réserve de celui qui valide un retour. Le scénario est volontairement petit : il tient dans une page, et il permet de tester chaque comportement sans données artificielles.
+Le projet de la série applique ce modèle à un scénario simple : un laboratoire prête du matériel — projecteurs, ordinateurs, caméras — à des étudiants. Trois collections suffisent. `equipements` décrit l'inventaire, `membres` contient les comptes et les rôles, `prets` relie un équipement à un membre. Deux rôles, `etudiant` et `technicien`, distinguent celui qui réserve de celui qui valide un retour. Le scénario est volontairement petit : il tient dans une page, et il permet de tester chaque comportement sans données artificielles.
 
 ## Trois lecteurs, trois documents
 
@@ -52,7 +52,7 @@ C'est pourquoi la documentation de ce projet se répartit en trois endroits. Le 
 
 Le [deuxième article]({% post_url 2026-11-18-installer-pocketbase-retour-dexperience %}) raconte l'installation et les premiers pas, avec l'erreur qui m'a le plus appris : un port déjà occupé et un message d'erreur que j'ai d'abord mal interprété.
 
-Le [troisième article]({% post_url 2026-11-20-règles-acces-trois-etats %}) analyse les règles d'accès. PocketBase distingue trois états — verrouillée, vide, expression — et cette distinction explique la plupart des réponses 403 et 400 que l'on rencontre au début.
+Le [troisième article]({% post_url 2026-11-20-regles-acces-trois-etats %}) analyse les règles d'accès. PocketBase distingue trois états — verrouillée, vide, expression — et cette distinction explique la plupart des réponses 403 et 400 que l'on rencontre au début.
 
 Le [quatrième article]({% post_url 2026-11-22-pocketbase-ou-supabase %}) compare PocketBase à Supabase sur des critères annoncés d'avance : licence, modèle de données, authentification, fichiers, temps réel, apprentissage et coût.
 
