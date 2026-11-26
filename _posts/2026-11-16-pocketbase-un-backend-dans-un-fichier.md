@@ -4,6 +4,7 @@ date: 2026-11-16 09:00:00 -0500
 categories: [PocketBase, Présentation]
 tags: [pocketbase, backend, sqlite, série]
 pin: true
+mermaid: true
 description: "Présentation de la série : ce que contient PocketBase, à qui elle s'adresse et comment les quatre articles suivants s'enchaînent."
 ---
 

@@ -3,6 +3,7 @@ title: "Règles d'accès : trois états qui expliquent tout"
 date: 2026-11-20 09:00:00 -0500
 categories: [PocketBase, Analyse]
 tags: [pocketbase, sécurité, api, règles]
+mermaid: true
 description: "Analyse des règles d'accès de PocketBase : verrouillée, vide, expression, avec les réponses réelles obtenues par deux comptes différents."
 ---
 
