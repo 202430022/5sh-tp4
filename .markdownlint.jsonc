@@ -1,0 +1,22 @@
+{
+  // Toutes les règles sont actives, sauf les exceptions ci-dessous.
+  "default": true,
+
+  // Longueur des lignes : désactivée.
+  // Chaque paragraphe est écrit sur une seule ligne, et une commande ne peut pas être coupée.
+  "MD013": false,
+
+  // HTML intégré : seulement les balises justifiées au document 10_20.5.
+  "MD033": {
+    "allowed_elements": ["details", "summary", "kbd", "br"]
+  },
+
+  // Texte de lien générique : la liste par défaut est en anglais.
+  "MD059": {
+    "prohibited_texts": ["cliquez ici", "ici", "lien", "en savoir plus", "plus"]
+  },
+
+  // Style des colonnes des tableaux : désactivée.
+  // La convention du cours écrit la ligne de délimitation |---|---|, sans aligner les colonnes.
+  "MD060": false
+}

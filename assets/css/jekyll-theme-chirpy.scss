@@ -1,0 +1,36 @@
+---
+---
+
+@use 'abstracts/variables' with (
+  $theme: '{{ site.theme_mode }}',
+  $font-family-base: ('Inter', 'Segoe UI', sans-serif),
+  $font-family-heading: ('Source Serif 4', Georgia, serif)
+);
+
+/* prettier-ignore */
+@use 'main
+{%- if jekyll.environment == 'production' -%}
+  .bundle
+{%- endif -%}
+';
+
+/* Personnalisation du thème Chirpy : palette et polices du blogue. */
+[data-bs-theme='light'] {
+  --main-bg: #fbfaf7;
+  --text-color: #1f2933;
+  --heading-color: #0b3d3b;
+  --link-color: #0b5d7a;
+  --link-underline-color: #cfe0dc;
+  --text-muted-color: #5b6666;
+  --label-color: #3f4a4a;
+  --site-title-color: #0b3d3b;
+  --site-subtitle-color: #3f4a4a;
+  --sidebar-bg: #eef3f0;
+  --sidebar-border-color: #dce6e1;
+  --sidebar-muted-color: #3f4a4a;
+  --sidebar-active-color: #0b3d3b;
+  --sidebar-hover-bg: #dfeae4;
+  --toc-highlight: #0b5d7a;
+  --card-bg: #ffffff;
+  --tb-border-color: #dce6e1;
+}

@@ -1,0 +1,9 @@
+{
+  // Reprend la configuration de la racine du dépôt.
+  "extends": "../.markdownlint.jsonc",
+
+  // Blocs de code entourés de lignes vides : désactivée pour les articles.
+  // Chirpy place l'attribut {: file="..." } sur la ligne qui suit le bloc,
+  // sans ligne vide entre les deux. MD031 y verrait une erreur.
+  "MD031": false
+}
