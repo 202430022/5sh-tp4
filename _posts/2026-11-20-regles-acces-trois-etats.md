@@ -2,7 +2,7 @@
 title: "Règles d'accès : trois états qui expliquent tout"
 date: 2026-11-20 09:00:00 -0500
 categories: [PocketBase, Analyse]
-tags: [pocketbase, securite, api, regles]
+tags: [pocketbase, sécurité, api, règles]
 description: "Analyse des règles d'accès de PocketBase : verrouillée, vide, expression, avec les réponses réelles obtenues par deux comptes différents."
 ---
 
@@ -20,7 +20,7 @@ Dans PocketBase, chaque opération d'une collection possède sa propre règle : 
 
 Le point contre-intuitif est le suivant : `null` ne veut pas dire « aucune règle, donc tout est permis ». Cela veut dire « aucune règle n'accorde l'accès », donc personne, sauf un superuser. La chaîne vide est l'inverse exact : elle accorde l'accès à tous. Entre les deux, l'expression est évaluée pour chaque requête, avec le contexte de l'utilisateur authentifié.
 
-Sur la collection `membres` du projet, la lecture est verrouillée : elle contient des courriels et des rôles, et rien ne justifie qu'un client anonyme les liste. Sur `equipements`, la lecture est publique : l'inventaire du laboratoire n'a rien de secret. Sur `prets`, la lecture est une expression, parce qu'un étudiant doit voir ses emprunts et le technicien doit voir tous les emprunts.
+Sur la collection `membres` du projet, la lecture est verrouillée : elle contient des courriels et des rôles, et rien ne justifie qu'un client anonyme les liste. Sur `équipements`, la lecture est publique : l'inventaire du laboratoire n'a rien de secret. Sur `prets`, la lecture est une expression, parce qu'un étudiant doit voir ses emprunts et le technicien doit voir tous les emprunts.
 
 ## Le trajet d'une requête
 
@@ -57,12 +57,12 @@ J'ai créé deux comptes dans la collection `membres` : Alice, avec le rôle `et
 | Requête | Jeton | Réponse obtenue |
 |---|---|---|
 | `GET /api/collections/membres/records` | aucun | 403, « Only superusers can perform this action. » |
-| `GET /api/collections/equipements/records` | aucun | 200, liste complète |
-| `POST /api/collections/equipements/records` | aucun | 400, « Failed to create record. » |
+| `GET /api/collections/équipements/records` | aucun | 200, liste complète |
+| `POST /api/collections/équipements/records` | aucun | 400, « Failed to create record. » |
 | `GET /api/collections/prets/records` | Alice | 200, un seul prêt, le sien |
 | `GET /api/collections/prets/records` | Benoît | 200, deux prêts |
-| `POST /api/collections/equipements/records` | Alice | 400, « Failed to create record. » |
-| `POST /api/collections/equipements/records` | Benoît | 200, enregistrement créé |
+| `POST /api/collections/équipements/records` | Alice | 400, « Failed to create record. » |
+| `POST /api/collections/équipements/records` | Benoît | 200, enregistrement créé |
 
 Trois enseignements sortent de ce tableau. La règle verrouillée produit un 403 explicite, qui nomme les superusers : c'est le cas le plus lisible. La règle vide produit un 200 sans jeton : c'est le cas le plus dangereux si on l'applique par distraction à une collection sensible. Enfin, le refus d'écriture produit un 400 générique, identique pour un anonyme et pour un étudiant authentifié. PocketBase ne dit pas quelle règle a échoué, ni pourquoi.
 
@@ -83,7 +83,7 @@ migrate((app) => {
     "updateRule": "@request.auth.role = \"technicien\"",
     "viewRule": "@request.auth.id != \"\" && (membre = @request.auth.id || @request.auth.role = \"technicien\")"
   })
-  // ... définition des champs equipement, membre, date_debut, date_retour_prevue, retourne
+  // ... définition des champs équipement, membre, date_debut, date_retour_prevue, retourne
 }, (app) => {
   // ... suppression de la collection au retour arrière
 })
@@ -96,7 +96,7 @@ La règle de lecture se lit comme une phrase : l'utilisateur doit être authenti
 
 Une règle d'accès n'est pas une permission abstraite : c'est une expression évaluée à chaque requête, avec un coût et un contexte. Écrire `""` par facilité revient à publier la collection. Écrire `null` par prudence revient à la rendre invisible, y compris pour l'application. Et une expression doit être testée avec au moins deux comptes de rôles différents, sinon on ne vérifie que le cas qui marche.
 
-La procédure de vérification, avec les commandes et les deux comptes, est décrite dans le wiki : [Vérifier les règles d'accès](https://github.com/202430022/5sh-tp4/wiki/Verifier-les-regles-dacces). Les valeurs des règles, elles, sont dans la référence : [Règles d'accès des collections](https://github.com/202430022/5sh-tp4/wiki/Regles-dacces).
+La procédure de vérification, avec les commandes et les deux comptes, est décrite dans le wiki : [Vérifier les règles d'accès](https://github.com/202430022/5sh-tp4/wiki/Verifier-les-règles-dacces). Les valeurs des règles, elles, sont dans la référence : [Règles d'accès des collections](https://github.com/202430022/5sh-tp4/wiki/Regles-dacces).
 
 ## Sources
 
