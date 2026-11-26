@@ -1,0 +1,30 @@
+name: Debug liens
+
+on:
+  push:
+    paths:
+      - .github/workflows/debug-liens.yml
+
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.4
+          bundler-cache: true
+
+      - name: Build
+        run: bundle exec jekyll b -d "_site/5sh-tp4"
+        env:
+          JEKYLL_ENV: production
+
+      - name: Proofer
+        run: |
+          bundle exec htmlproofer _site --disable-external 2>&1 | tee proofer.log | tail -n 40 | while IFS= read -r line; do echo "::error::$line"; done
