@@ -6,18 +6,18 @@ tags: [pocketbase, installation, dépannage]
 description: "Récit de l'installation de PocketBase 0.40.6 sous Windows : un port déjà occupé, un message trompeur, et deux dossiers qu'il faut absolument distinguer."
 ---
 
-Je m'attendais à passer vingt minutes sur l'installation de PocketBase. J'en ai passé une heure, et la moitié de ce temps n'a pas servi à installer quoi que ce soit : elle a servi à comprendre ce que le logiciel me disait. Voici le récit de ces premiers pas, avec le message d'erreur complet et ce que j'en ai tiré.
+Je pensais finir l'installation de PocketBase en vingt minutes. Il m'en a fallu soixante, et la moitié de ce temps n'a servi à rien d'utile au sens strict : j'ai surtout déchiffré ce que le logiciel m'affichait. Voici ce qui s'est passé, avec le message d'erreur au complet et ce que j'en ai retenu.
 
 ## Le téléchargement, la partie simple
 
-Le site officiel propose une archive par système d'exploitation. Pour Windows, c'est un fichier ZIP d'environ 13 Mo qui contient un exécutable de 34 Mo, une licence et un journal des versions. J'ai décompressé l'archive dans un dossier `pocketbase/` à la racine du dépôt du projet, puis j'ai lancé la commande indiquée par la documentation.
+Le site officiel propose une archive par système d'exploitation. Sous Windows, c'est un ZIP d'environ 13 Mo qui contient un exécutable de 34 Mo, une licence et un journal des versions. J'ai décompressé l'archive dans un dossier `pocketbase/` à la racine du dépôt du projet, puis j'ai lancé la commande indiquée par la documentation.
 
 ```powershell
 .\pocketbase.exe superuser create <COURRIEL> "<MOT_DE_PASSE>"
 .\pocketbase.exe serve --http=127.0.0.1:8090
 ```
 
-Le serveur démarre, affiche deux adresses — l'API sur `/api/` et la console sur `/_/` — et reste actif dans le terminal. La console s'ouvre dans le navigateur, le compte administrateur fonctionne, et les collections apparaissent. Jusque-là, tout est conforme à la promesse : un fichier, une commande, une interface.
+Le serveur démarre, affiche deux adresses, l'API sur `/api/` et la console sur `/_/`, et reste actif dans le terminal. La console s'ouvre dans le navigateur, le compte administrateur fonctionne, les collections apparaissent. Tout marche du premier coup.
 
 ## L'erreur la plus instructive : le port occupé
 
@@ -27,15 +27,15 @@ Le lendemain, j'ai relancé le serveur sans avoir fermé celui de la veille. Le 
 2026/11/25 19:24:16 listen tcp 127.0.0.1:8090: bind: Une seule utilisation de chaque adresse de socket (protocole/adresse réseau/port) est habituellement autorisée.
 ```
 
-Sur le moment, j'ai lu « adresse réseau » et j'ai cru à un problème de carte réseau ou de pare-feu. C'était faux. Le message dit exactement l'inverse : le port 8090 est déjà pris par un autre processus, en l'occurrence mon propre serveur resté actif. La formulation est celle de Windows, pas celle de PocketBase, ce qui ajoute à la confusion : le logiciel ne fait que rapporter l'erreur du système.
+Sur le moment, j'ai lu « adresse réseau » et j'ai cru à un problème de carte réseau ou de pare-feu. C'était faux. Le message dit exactement l'inverse : le port 8090 est déjà pris par un autre processus, en l'occurrence mon propre serveur resté actif. La formulation vient de Windows, pas de PocketBase, ce qui ajoute à la confusion. Le logiciel se contente de rapporter l'erreur du système.
 
-Deux solutions, toutes les deux utiles. La première consiste à fermer le processus qui occupe le port. La seconde consiste à démarrer sur un autre port, ce qui est d'ailleurs la bonne habitude à prendre quand on travaille à plusieurs sur la même machine :
+Deux solutions existent. On peut fermer le processus qui occupe le port, ou démarrer sur un autre port. La deuxième option est d'ailleurs la bonne habitude à prendre quand plusieurs personnes travaillent sur la même machine :
 
 ```powershell
 .\pocketbase.exe serve --http=127.0.0.1:8091
 ```
 
-Cette erreur m'a appris quelque chose de plus général : avec PocketBase, le message affiché est souvent celui du système d'exploitation ou de la base, pas une explication pédagogique. Il faut le lire littéralement. « Bind » veut dire « attacher une adresse à un socket », et l'échec de cette opération n'a qu'une cause fréquente : l'adresse est déjà utilisée.
+Cette erreur m'a appris quelque chose de plus général. Avec PocketBase, le message affiché est souvent celui du système d'exploitation ou de la base de données, pas une explication pédagogique. Il faut le lire littéralement. « Bind » veut dire « attacher une adresse à un socket », et quand ça échoue, c'est presque toujours parce que l'adresse est déjà utilisée.
 
 ## Le deuxième piège : 403 ou 400
 
@@ -51,13 +51,13 @@ Une création refusée renvoyait, elle, une erreur 400 beaucoup plus vague :
 {"data":{},"message":"Failed to create record.","status":400}
 ```
 
-J'ai d'abord cherché un champ obligatoire manquant. En réalité, les deux refus venaient de la même cause : la règle d'accès de la collection. PocketBase choisit simplement de ne pas détailler un refus d'écriture, pour ne pas révéler la structure des règles à un client non autorisé. Comprendre cela demandait de lire la documentation des règles, pas de modifier la requête au hasard. C'est le sujet du troisième article de la série.
+J'ai d'abord cherché un champ obligatoire manquant. Au final, les deux refus venaient de la même cause : la règle d'accès de la collection. PocketBase choisit simplement de ne pas détailler un refus d'écriture, pour ne pas révéler la structure des règles à un client non autorisé. Comprendre cela demandait de lire la documentation des règles, pas de modifier la requête au hasard. C'est le sujet du troisième article de la série.
 
 ## Deux dossiers, deux rôles
 
-Le point que j'aurais aimé comprendre plus tôt concerne les deux dossiers créés par PocketBase. `pb_data/` contient la base, les fichiers déposés, les journaux et les sauvegardes : c'est l'état de mon poste, et il ne se versionne jamais. `pb_migrations/` contient le schéma sous forme de scripts : c'est ce qui permet à un collègue de recréer les collections chez lui.
+Le point que j'aurais aimé comprendre plus tôt concerne les deux dossiers créés par PocketBase. `pb_data/` contient la base, les fichiers déposés, les journaux et les sauvegardes. C'est l'état de mon poste, et il ne se versionne jamais. `pb_migrations/` contient le schéma sous forme de scripts, ce qui permet à un collègue de recréer les collections chez lui.
 
-J'ai vérifié ce comportement en supprimant `pb_data/` après avoir conservé une copie. Au redémarrage, les collections étaient bien recréées à partir des migrations, mais la base était vide et il a fallu recréer le compte administrateur. Autrement dit, les migrations reproduisent la structure, pas les données ni les comptes. Cette distinction paraît évidente une fois écrite ; elle ne l'était pas avant l'essai.
+J'ai vérifié ce comportement en supprimant `pb_data/` après en avoir conservé une copie. Au redémarrage, les collections étaient bien recréées à partir des migrations, mais la base était vide et il a fallu recréer le compte administrateur. Autrement dit, les migrations reproduisent la structure, pas les données ni les comptes. Cette distinction paraît évidente une fois écrite ; elle ne l'était pas avant l'essai.
 
 ## Ce que je ferais autrement
 

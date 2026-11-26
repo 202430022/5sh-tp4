@@ -6,11 +6,11 @@ tags: [pocketbase, sécurité, api, règles]
 description: "Analyse des règles d'accès de PocketBase : verrouillée, vide, expression, avec les réponses réelles obtenues par deux comptes différents."
 ---
 
-Une règle d'accès à `null`, une règle à `""` et une règle qui contient une expression ne produisent pas trois nuances de la même chose : ce sont trois comportements distincts. Confondre les deux premières est l'erreur la plus fréquente quand on débute, et c'est aussi celle qui produit les messages les plus déroutants. Cet article analyse les trois états, puis les vérifie avec deux comptes réels.
+Une règle à `null`, une règle à `""` et une règle qui contient une expression ne donnent pas trois variantes d'un même comportement. Ce sont trois comportements différents, et confondre les deux premiers est l'erreur la plus fréquente au début, celle qui produit aussi les messages les plus déroutants. J'ai vérifié les trois avec deux comptes réels, et les résultats sont ci-dessous.
 
 ## Trois états, pas un
 
-Dans PocketBase, chaque opération d'une collection possède sa propre règle : `listRule`, `viewRule`, `createRule`, `updateRule` et `deleteRule`. Chacune peut prendre trois formes.
+Dans PocketBase, chaque opération d'une collection a sa propre règle : `listRule`, `viewRule`, `createRule`, `updateRule` et `deleteRule`. Chacune peut prendre trois formes.
 
 | Valeur de la règle | Qui passe | Effet observable |
 |---|---|---|
@@ -18,7 +18,7 @@ Dans PocketBase, chaque opération d'une collection possède sa propre règle : 
 | `""` (chaîne vide) | Tout le monde, y compris sans jeton | Lecture publique, écriture publique |
 | Une expression | Les requêtes pour lesquelles l'expression est vraie | Résultat filtré, ou refus |
 
-Le point contre-intuitif est le suivant : `null` ne veut pas dire « aucune règle, donc tout est permis ». Cela veut dire « aucune règle n'accorde l'accès », donc personne, sauf un superuser. La chaîne vide est l'inverse exact : elle accorde l'accès à tous. Entre les deux, l'expression est évaluée pour chaque requête, avec le contexte de l'utilisateur authentifié.
+Ce qui surprend au début : `null` ne veut pas dire « aucune règle, donc tout est permis ». Cela veut dire « aucune règle n'accorde l'accès », donc personne sauf un superuser. La chaîne vide est l'inverse exact : elle accorde l'accès à tous. Entre les deux, l'expression est évaluée pour chaque requête, avec le contexte de l'utilisateur authentifié.
 
 Sur la collection `membres` du projet, la lecture est verrouillée : elle contient des courriels et des rôles, et rien ne justifie qu'un client anonyme les liste. Sur `equipements`, la lecture est publique : l'inventaire du laboratoire n'a rien de secret. Sur `prets`, la lecture est une expression, parce qu'un étudiant doit voir ses emprunts et le technicien doit voir tous les emprunts.
 
@@ -48,7 +48,7 @@ sequenceDiagram
     end
 ```
 
-Deux détails de ce schéma ont des conséquences pratiques. D'abord, la règle est évaluée avant la requête SQL : elle ne filtre pas un résultat déjà chargé, elle restreint la sélection. Ensuite, l'identité du compte est chargée à partir du jeton, ce qui signifie que les champs personnalisés de la collection d'authentification — ici `role` — sont disponibles dans l'expression.
+La règle passe avant la requête SQL : elle ne filtre pas un résultat déjà chargé, elle restreint la sélection. L'identité du compte vient du jeton, donc les champs personnalisés de la collection d'authentification, ici `role`, sont disponibles dans l'expression.
 
 ## La vérification avec deux comptes
 
@@ -64,9 +64,9 @@ J'ai créé deux comptes dans la collection `membres` : Alice, avec le rôle `et
 | `POST /api/collections/equipements/records` | Alice | 400, « Failed to create record. » |
 | `POST /api/collections/equipements/records` | Benoît | 200, enregistrement créé |
 
-Trois enseignements sortent de ce tableau. La règle verrouillée produit un 403 explicite, qui nomme les superusers : c'est le cas le plus lisible. La règle vide produit un 200 sans jeton : c'est le cas le plus dangereux si on l'applique par distraction à une collection sensible. Enfin, le refus d'écriture produit un 400 générique, identique pour un anonyme et pour un étudiant authentifié. PocketBase ne dit pas quelle règle a échoué, ni pourquoi.
+La règle verrouillée produit un 403 explicite qui nomme les superusers : c'est le cas le plus lisible. La règle vide produit un 200 sans jeton : c'est le cas le plus dangereux si on l'applique par distraction à une collection sensible. Le refus d'écriture produit un 400 générique, identique pour un anonyme et pour un étudiant authentifié. PocketBase ne dit pas quelle règle a échoué, ni pourquoi.
 
-Ce dernier point mérite d'être répété : un 400 à la création ne signifie pas nécessairement que les données sont invalides. Il peut signifier que la règle d'écriture a refusé la requête. Pour distinguer les deux, il faut lire la règle de la collection, puis reproduire l'appel avec un compte qui y satisfait.
+Un 400 à la création ne veut pas dire que les données sont invalides. Il peut venir de la règle d'écriture qui a refusé la requête. Pour savoir lequel des deux c'est, il faut lire la règle de la collection et refaire l'appel avec un compte qui la satisfait.
 
 ## Ce que la migration montre
 
@@ -90,11 +90,11 @@ migrate((app) => {
 ```
 {: file="pocketbase/pb_migrations/1795652614_created_prets.js" }
 
-La règle de lecture se lit comme une phrase : l'utilisateur doit être authentifié, et il doit être soit le membre associé au prêt, soit un technicien. La règle de création est plus permissive — tout compte authentifié peut créer un prêt — mais la règle de mise à jour est réservée aux techniciens. C'est cohérent avec le scénario : un étudiant réserve, un technicien valide le retour.
+La règle de lecture se lit comme une phrase : l'utilisateur doit être authentifié, et il doit être soit le membre associé au prêt, soit un technicien. La règle de création est plus permissive, tout compte authentifié peut créer un prêt, mais la règle de mise à jour est réservée aux techniciens. C'est cohérent avec le scénario : un étudiant réserve, un technicien valide le retour.
 
 ## Ce que j'en retiens
 
-Une règle d'accès n'est pas une permission abstraite : c'est une expression évaluée à chaque requête, avec un coût et un contexte. Écrire `""` par facilité revient à publier la collection. Écrire `null` par prudence revient à la rendre invisible, y compris pour l'application. Et une expression doit être testée avec au moins deux comptes de rôles différents, sinon on ne vérifie que le cas qui marche.
+Une règle d'accès n'est pas une permission abstraite : c'est une expression évaluée à chaque requête, avec un coût et un contexte. Écrire `""` par facilité revient à publier la collection. Écrire `null` par prudence revient à la rendre invisible, y compris pour l'application. Une expression doit être testée avec au moins deux comptes de rôles différents, sinon on ne vérifie que le cas qui marche.
 
 La procédure de vérification, avec les commandes et les deux comptes, est décrite dans le wiki : [Vérifier les règles d'accès](https://github.com/202430022/5sh-tp4/wiki/Verifier-les-regles-dacces). Les valeurs des règles, elles, sont dans la référence : [Règles d'accès des collections](https://github.com/202430022/5sh-tp4/wiki/Regles-dacces).
 
